@@ -1,5 +1,7 @@
 % Orbital parameters
-semiMajorAxis = 6903e3;      % Semi-major axis (m)
+
+%orbitalPeriod = (71 * 60) + 32;
+%semiMajorAxis = 6903e3;      % Semi-major axis (m)
 eccentricity = 0.003622;     % Eccentricity
 inclination = 90;            % Inclination (deg)
 raan = 90;                   % RAAN (deg)
@@ -8,11 +10,23 @@ trueAnomaly = 0;             % True anomaly at epoch (deg)
 emass = 5.97219e24;           % Kg
 G = 6.6743e-11;
 mu = emass * G;              % Earth's gravitational parameter (km^3/s^2)
-R_E = 6371e3;                % Earth's radius (m)
+
+% Orbital parameters
+sunDistance = 1.496e11;  % Average distance from Earth to Sun in meters (1 AU)
+R_E = 6371e3;           % Earth's radius in meters
+
 max_time = 1440;             % Max time for simulation in minutes (1 day)
 
+va = 7571.4;
+vp = 7626.5;
+
+ra = (mu/(va)^2)*(1 + eccentricity);
+rp = (mu/(vp)^2)*(1 - eccentricity);
+
+semiMajorAxis = (rp + ra)/2;
+
 % Propagation settings
-startTime = datetime('now') + days(90);       % Start time (90 days from now)
+startTime = datetime('now'); % + days(90);       % Start time (90 days from now)
 stopTime = startTime + minutes(max_time);     % End time
 sampleTime = 60;                   % Sample time (seconds)
 
@@ -34,9 +48,7 @@ for ptr = 1:length(satStates)
     positions = [positions; r_tmp];  %#ok<AGROW>
 end
 
-% Orbital parameters
-sunDistance = 1.496e11;  % Average distance from Earth to Sun in meters (1 AU)
-R_E = 6371e3;           % Earth's radius in meters
+
 
 % Preallocate the array to store eclipse status: 0 = Sunlit, 1 = Penumbra, 2 = Umbra
 eclipseStatus = zeros(size(positions, 1), 1);
@@ -101,3 +113,16 @@ for i = 1:floor(max_time / T_minutes)  % Loop over the number of orbits
 end
 
 grid on;
+
+% (780 - 754)   ----> x
+% 95.1371       ----> 100
+x_spring =  (26 * 100)/95.1371;
+disp('Dark % in Spring/Fall');
+disp(x_spring);  % 27.3290 %
+
+
+% (1306 - 1275)   ----> x
+% 95.1371       ----> 100
+x_spring =  (31 * 100)/95.1371;
+disp('Dark % in Summer/Winter');
+disp(x_spring);  % 32,59 %
