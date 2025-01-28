@@ -26,7 +26,7 @@ rp = (mu/(vp)^2)*(1 - eccentricity);
 semiMajorAxis = (rp + ra)/2;
 
 % Propagation settings
-startTime = datetime('now'); % + days(90);       % Start time (90 days from now)
+startTime = datetime('now') + days(90);       % Start time (90 days from now)
 stopTime = startTime + minutes(max_time);     % End time
 sampleTime = 60;                   % Sample time (seconds)
 
