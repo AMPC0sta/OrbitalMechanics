@@ -36,7 +36,7 @@ longitude = -8.29133;  % Ground station longitude (degrees)
 
 % Min Elevation Angle (simulating mountains)
 minElevAngle = 10;  %minElevAngle = 0.0007113;  
-radio_range  = 2500e3; % Theoretical radio link range in meters
+radio_range  = 1500e3; % Theoretical radio link range in meters
 
 % Add ground station
 gs = groundStation(scenario, latitude, longitude, MinElevationAngle=minElevAngle, Name="Ground Station (Azurem)");
@@ -101,6 +101,7 @@ bar(LOS_start_times, LOS_durations, 'FaceColor', 'b');
 xlabel('Time (UTC)');
 ylabel('Duration of LOS (minutes)');
 title('Duration of LOS Events with Ground Station');
+title(sprintf('Duration of LOS Events with Ground Station with elevation angle of  %.2f degrees and a radio range of  %.2f km!', round(minElevAngle,2), round(radio_range/1000,2)));  % Concatenated title
 xtickformat('yyyy-MM-dd HH:mm:ss');  % Formatting x-axis to display time
 grid on;
 
