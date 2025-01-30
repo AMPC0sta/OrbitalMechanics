@@ -20,8 +20,8 @@ a = (rp + ra)/2;
 
 queryTime = datetime("now", TimeZone="UTC");
 startTime = queryTime;
-stopTime = queryTime + hours(24);
-sampleTime = 60;  % Time step in seconds
+stopTime = queryTime + days(14); %hours(24);
+sampleTime = 10;  % Time step in seconds
 
 scenario = satelliteScenario();
 scenario.StartTime = startTime;
@@ -49,6 +49,7 @@ acIntervals = accessIntervals(ac);
 LOS_start_times = [];
 LOS_end_times = [];
 LOS_durations = [];
+LOS_max_elevations = [];
 
 if ~isempty(acIntervals)
     % Extract satellite states
@@ -60,7 +61,8 @@ if ~isempty(acIntervals)
     % Initialize variables to track the start and end of LOS periods
     inLOS = false;
     LOS_start = NaN;
-    
+    max_elevation = 0;
+
     % Iterate through the time array
     for t = 1:length(timeArray)
         satPos = satStates(1:3, t)';  % Extract satellite position (ECEF)
@@ -77,6 +79,10 @@ if ~isempty(acIntervals)
                 LOS_start = timeArray(t);
                 inLOS = true;
             end
+
+            if elevation > max_elevation
+                max_elevation = elevation;
+            end
         else
             if inLOS
                 % LOS just ended, record the duration
@@ -87,6 +93,8 @@ if ~isempty(acIntervals)
                 LOS_start_times = [LOS_start_times; LOS_start];
                 LOS_end_times = [LOS_end_times; LOS_end];
                 LOS_durations = [LOS_durations; LOS_duration];
+                LOS_max_elevations = [LOS_max_elevations,max_elevation];
+                max_elevation = 0;
                 inLOS = false;
             end
         end
@@ -96,6 +104,7 @@ end
 disp("LOS vectors computed successfully.");
 
 % Plot LOS start times vs. duration
+%{
 figure;
 bar(LOS_start_times, LOS_durations, 'FaceColor', 'b');
 xlabel('Time (UTC)');
@@ -104,6 +113,30 @@ title('Duration of LOS Events with Ground Station');
 title(sprintf('Duration of LOS Events with Ground Station with elevation angle of  %.2f degrees and a radio range of  %.2f km!', round(minElevAngle,2), round(radio_range/1000,2)));  % Concatenated title
 xtickformat('yyyy-MM-dd HH:mm:ss');  % Formatting x-axis to display time
 grid on;
+%}
+figure;
+bar(LOS_start_times, LOS_durations, 'FaceColor', 'b');
+xlabel('Time (UTC)');
+ylabel('Duration of LOS (minutes)');
+title(sprintf('Duration of LOS Events with Ground Station with elevation angle of %.2f degrees and a radio range of %.2f km!', ...
+    round(minElevAngle, 2), round(radio_range / 1000, 2)));  % Concatenated title
+xtickformat('yyyy-MM-dd HH:mm:ss');  % Formatting x-axis to display time
+grid on;
+
+% Add text labels inside each bar (vertically aligned)
+hold on;
+for k = 1:length(LOS_durations)
+    text(LOS_start_times(k), LOS_durations(k) / 2, ...  % Position (X, Y at half height of the bar)
+         sprintf('%.2f°', LOS_max_elevations(k)), ...   % Elevation angle label
+         'HorizontalAlignment', 'center', ...
+         'VerticalAlignment', 'middle', ...
+         'Rotation', 90, ...    % Rotates text 90 degrees (vertical)
+         'FontSize', 10, 'FontWeight', 'bold', ...
+         'Color', 'w');  % White text for contrast
+end
+hold off;
+
+
 
 % Function to convert Lat/Lon to ECEF coordinates
 function ecef = latlon2ecef(lat, lon, alt)
