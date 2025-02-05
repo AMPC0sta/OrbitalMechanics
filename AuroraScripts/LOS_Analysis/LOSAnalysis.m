@@ -17,10 +17,11 @@ ra = (mu/(va)^2)*(1 + e);
 rp = (mu/(vp)^2)*(1 - e);
 
 a = (rp + ra)/2;
+disp(a);
 
 queryTime = datetime("now", TimeZone="UTC");
 startTime = queryTime;
-stopTime = queryTime + days(14); %hours(24);
+stopTime = queryTime + days(7); %hours(24);
 sampleTime = 10;  % Time step in seconds
 
 scenario = satelliteScenario();
@@ -36,7 +37,7 @@ longitude = -8.29133;  % Ground station longitude (degrees)
 
 % Min Elevation Angle (simulating mountains)
 minElevAngle = 10;  %minElevAngle = 0.0007113;  
-radio_range  = 1500e3; % Theoretical radio link range in meters
+radio_range  = 1700e3; % Theoretical radio link range in meters
 
 % Add ground station
 gs = groundStation(scenario, latitude, longitude, MinElevationAngle=minElevAngle, Name="Ground Station (Azurem)");
@@ -50,6 +51,9 @@ LOS_start_times = [];
 LOS_end_times = [];
 LOS_durations = [];
 LOS_max_elevations = [];
+
+satStates = [];
+timeArray = [];
 
 if ~isempty(acIntervals)
     % Extract satellite states
