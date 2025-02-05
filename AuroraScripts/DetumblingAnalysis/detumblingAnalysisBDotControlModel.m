@@ -90,7 +90,7 @@ for k = 1:numSteps-1
 
     if k > 1
         %B_dot = (B_body - B_body_prev) / sampleTime;
-        B_dot = abs(B_body_prev - B_body) / sampleTime;
+        B_dot = (B_body_prev - B_body) / sampleTime;
     else
         B_dot = [0; 0; 0];
     end
