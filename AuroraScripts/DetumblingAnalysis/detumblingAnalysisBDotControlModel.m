@@ -10,7 +10,7 @@ nu = 0;            % True Anomaly (deg)
 
 queryTime = datetime(2024, 2, 1, 12, 0, 0, 'TimeZone', 'UTC');  
 startTime = queryTime;
-stopTime = queryTime + hours(24); % 2-day simulation
+stopTime = queryTime + minutes(1440);%hours(10); % 2-day simulation
 sampleTime = 1;  % 1-second time step
 
 % Create Satellite Scenario and Propagate Orbit
@@ -47,17 +47,25 @@ end
 
 for k = 1:numSteps
     decimalYear = year(timeArray(k)) + (day(timeArray(k), 'dayofyear') - 1)/365.25;
-    [B_north, B_east, B_down] = igrfmagm(altitudes(k), latitudes(k), longitudes(k), decimalYear);
+    %[B_north, B_east, B_down] = igrfmagm(altitudes(k), latitudes(k), longitudes(k), decimalYear);
+    [XYZ,H,D,I,F] = igrfmagm(altitudes(k), latitudes(k), longitudes(k), decimalYear(1),13);
+    B_north = XYZ(1);
+    B_east = XYZ(2);
+    B_down = XYZ(3);
     B_vectors(k, :) = ([B_north(1), B_east(1), B_down(1)] * 1e-9);  % Convert nT to Tesla
 end
+
+
+
 
 I = diag([0.02, 0.02, 0.02]);  % Moment of inertia matrix (kg*m^2)
 q = [1; 0; 0; 0];  % Initial quaternion (no rotation)
 q = q/norm(q);
 omega = [deg2rad(2); deg2rad(3); deg2rad(-2)];  % Initial angular velocity (rad/s)
+%omega = [0;0;0];  % Initial angular velocity (rad/s)
 
 B_body_prev = [0; 0; 0];  % Initial previous magnetic field
-k_b = 5000;  % Gain for B-dot controller (adjust as needed)
+k_b = 500000;  % Gain for B-dot controller (adjust as needed)
 
 % Storage Arrays
 quaternionArray = zeros(4, numSteps);
@@ -81,7 +89,8 @@ T_z = zeros(numSteps, 1);
 
 % Attitude Propagation Loop
 for k = 1:numSteps-1
-    B_body = nedToBody(B_vectors(k, :)', latitudes(k), longitudes(k), q, theta_G_stat(k));
+    %B_body = nedToBody(B_vectors(k, :)', latitudes(k), longitudes(k), q, theta_G_stat(k));
+    B_body = ned_to_body(q, B_vectors(k, :)');
     
     % Save the magnetic field in the body frame
     B_body_x(k) = B_body(1);
@@ -90,7 +99,7 @@ for k = 1:numSteps-1
 
     if k > 1
         %B_dot = (B_body - B_body_prev) / sampleTime;
-        B_dot = (B_body_prev - B_body) / sampleTime;
+        B_dot = (B_body - B_body_prev) / sampleTime;
     else
         B_dot = [0; 0; 0];
     end
@@ -98,6 +107,7 @@ for k = 1:numSteps-1
     B_body_prev = B_body;
 
     m = - k_b * B_dot;
+    
 
     % Compute Magnetic Torque (T = m × B)
     T_mag = cross(m, B_body);  
@@ -136,16 +146,17 @@ end
 figure;
 
 % Subplot 1: Quaternions
+% Subplot 1: Absolute Value of Quaternion Components
 subplot(2, 1, 1);
 hold on;
-plot(timeArray, quaternionArray(1, :), 'r', 'LineWidth', 1.5); 
-plot(timeArray, quaternionArray(2, :), 'g', 'LineWidth', 1.5);
-plot(timeArray, quaternionArray(3, :), 'b', 'LineWidth', 1.5);
-plot(timeArray, quaternionArray(4, :), 'k', 'LineWidth', 1.5);
+plot(timeArray, abs(quaternionArray(1, :)), 'r', 'LineWidth', 1.5); 
+plot(timeArray, abs(quaternionArray(2, :)), 'g', 'LineWidth', 1.5);
+plot(timeArray, abs(quaternionArray(3, :)), 'b', 'LineWidth', 1.5);
+plot(timeArray, abs(quaternionArray(4, :)), 'k', 'LineWidth', 1.5);
 xlabel('Time (UTC)');
-ylabel('Quaternion Components');
-title('Quaternions (q0, q1, q2, q3)');
-legend('q0', 'q1', 'q2', 'q3');
+ylabel('Absolute Quaternion Components');
+title('Absolute Quaternion Components (|q0|, |q1|, |q2|, |q3|)');
+legend('|q0|', '|q1|', '|q2|', '|q3|');
 grid on;
 
 % Subplot 2: Angular Velocity
@@ -254,4 +265,25 @@ function mtrx = ecef2eci(theta_G)
          ];
 
     mtrx = m';
+end
+
+function V_body = ned_to_body(q, V_ned)
+    % Ensure quaternion is normalized
+    q = q / norm(q);
+
+    % Extract quaternion components
+    q0 = q(1); % Scalar part
+    q1 = q(2);
+    q2 = q(3);
+    q3 = q(4);
+
+    % Compute the DCM from quaternion
+    C_b_n = [
+        1 - 2*(q2^2 + q3^2),  2*(q1*q2 + q0*q3),  2*(q1*q3 - q0*q2);
+        2*(q1*q2 - q0*q3),  1 - 2*(q1^2 + q3^2),  2*(q2*q3 + q0*q1);
+        2*(q1*q3 + q0*q2),  2*(q2*q3 - q0*q1),  1 - 2*(q1^2 + q2^2)
+    ];
+
+    % Convert the vector from NED to Body Frame
+    V_body = C_b_n * V_ned;
 end

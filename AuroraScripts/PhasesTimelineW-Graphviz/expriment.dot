@@ -1,0 +1,17 @@
+digraph ArrowTimeline {
+    rankdir=LR;
+    node [shape=plaintext];
+
+    // Timeline arrow
+    " " -> " " -> " " -> " " [arrowhead=vee, penwidth=2];
+
+    // Events below the timeline
+    "2025-02-15\nLaunch" [shape=box];
+    "2025-03-10\nDeployment" [shape=box];
+    "2025-04-01\nOperation Begins" [shape=box];
+
+    // Positioning below
+    " " -> "2025-02-15\nLaunch" [dir=none];
+    " " -> "2025-03-10\nDeployment" [dir=none];
+    " " -> "2025-04-01\nOperation Begins" [dir=none];
+}
