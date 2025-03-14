@@ -1,13 +1,13 @@
 clc; clear; close all;
 
 %% === 1️⃣ Define Satellite Orbit Parameters ===
-a = 6903e3;        % Semi-major axis (m)
-%a = 6928.137e3;
-e = 0.003622;      % Eccentricity
-%e = 0;      % Eccentricity
-i = 40.0;            % Inclination (deg)
-RAAN = 90.0;         % Right Ascension of Ascending Node (deg)
-omega = 90;         % Argument of Periapsis (deg)
+%a = 6903e3;        % Semi-major axis (m)
+a = 6928.137e3;
+%e = 0.003622;      % Eccentricity
+e = 0;      % Eccentricity
+i = 96.7;            % Inclination (deg)
+RAAN = 180;         % Right Ascension of Ascending Node (deg)
+omega = 0;         % Argument of Periapsis (deg)
 nu = 0;            % True Anomaly (deg)
 
 queryTime = datetime(2024, 2, 1, 12, 0, 0, 'TimeZone', 'UTC');  

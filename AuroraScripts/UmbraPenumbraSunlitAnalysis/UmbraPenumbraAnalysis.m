@@ -2,11 +2,13 @@
 
 %orbitalPeriod = (71 * 60) + 32;
 %semiMajorAxis = 6903e3;      % Semi-major axis (m)
-eccentricity = 0.003622;     % Eccentricity
-inclination = 90;            % Inclination (deg)
-raan = 90;                   % RAAN (deg)
+%eccentricity = 0.003622;     % Eccentricity
+eccentricity = 0;     % Eccentricity
+inclination = 97.6;            % Inclination (deg)
+raan = 0;                   % RAAN (deg)
 argPerigee = 0;              % Argument of perigee (deg)
 trueAnomaly = 0;             % True anomaly at epoch (deg)
+semiMajorAxis = 6928.137e3;
 emass = 5.97219e24;           % Kg
 G = 6.6743e-11;
 mu = emass * G;              % Earth's gravitational parameter (km^3/s^2)
@@ -23,7 +25,8 @@ vp = 7626.5;
 ra = (mu/(va)^2)*(1 + eccentricity);
 rp = (mu/(vp)^2)*(1 - eccentricity);
 
-semiMajorAxis = (rp + ra)/2;
+%semiMajorAxis = (rp + ra)/2;
+
 
 % Propagation settings
 startTime = datetime('now') + days(90);       % Start time (90 days from now)
@@ -56,9 +59,6 @@ eclipseStatus = zeros(size(positions, 1), 1);
 % Calculate the orbital period
 T = 2 * pi * sqrt((semiMajorAxis^3) / mu);  % Orbital period in seconds
 
-% Convert the orbital period to minutes
-T_minutes = T / 60;  % Orbital period in minutes
-disp(T_minutes);
 
 % Loop through all positions to calculate Umbra/Penumbra
 for t = 1:size(positions, 1)
