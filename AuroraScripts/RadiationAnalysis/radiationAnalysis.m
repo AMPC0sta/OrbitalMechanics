@@ -2,17 +2,17 @@ clc; clear; close all;
 
 %% === 1️⃣ Define Satellite Orbit Parameters ===
 %a = 6903e3;        % Semi-major axis (m)
-a = 6928.137e3;
+a = 6928.137e3; % r + h
 %e = 0.003622;      % Eccentricity
 e = 0;      % Eccentricity
-i = 96.7;            % Inclination (deg)
-RAAN = 180;         % Right Ascension of Ascending Node (deg)
+i = 90;            % Inclination (deg)
+RAAN = 0;         % Right Ascension of Ascending Node (deg)
 omega = 0;         % Argument of Periapsis (deg)
 nu = 0;            % True Anomaly (deg)
 
 queryTime = datetime(2024, 2, 1, 12, 0, 0, 'TimeZone', 'UTC');  
 startTime = queryTime;
-stopTime = queryTime + minutes(1440); % 24-hour simulation
+stopTime = queryTime + minutes(100); % 24-hour simulation
 sampleTime = 30;  % 30-second time step
 
 % Create Satellite Scenario and Propagate Orbit
@@ -54,7 +54,9 @@ for k = 1:numSteps
 end
 
 %% === 4️⃣ Compute Radiation Levels Using Fixed Model ===
-radiation_dose_Sv = computeRadiationLevels(latitudes, longitudes, altitudes);
+%radiation_dose_Sv = computeRadiationLevels(latitudes, longitudes, altitudes);
+radiation_dose_Sv = computeRadiationLevelsAE9AP9(latitudes, longitudes, altitudes);
+
 
 %% === 5️⃣ Compute Accumulated Radiation Exposure Over 24 Hours ===
 accumulated_radiation_Sv = computeAccumulatedRadiation(radiation_dose_Sv, sampleTime);
@@ -66,7 +68,7 @@ final_accumulated_radiation = accumulated_radiation_Sv(end);
 time_96_min = 96 * 60;  % 96 minutes in seconds
 index_96 = find(seconds(timeArray - startTime) <= time_96_min, 1, 'last');
 
-figure("Name","SSO Orbit at 550 Km","NumberTitle","off");
+figure("Name","Polar Orbit at 550 Km with eccentricity 0","NumberTitle","off");
 
 % Magnetic Field Strength Plot
 subplot(4,1,1);
@@ -154,4 +156,57 @@ function accumulated_radiation_Sv = computeAccumulatedRadiation(radiation_dose_S
     
     % Compute accumulated dose using trapezoidal integration
     accumulated_radiation_Sv = cumtrapz(radiation_dose_Sv) * sampleTime;
+end
+
+function radiation_dose_Sv = computeRadiationLevelsAE9AP9(latitudes, longitudes, altitudes)
+    % Radiation model based on AE9/AP9 for 550 km polar orbit (unshielded)
+    
+    % Baseline unshielded dose rate from AE9/AP9 model (approx 20 krad/year)
+    baseline_dose_rate = 6.34e-6; % Sv/s (~20 krad/year)
+
+    % Initialize output array
+    radiation_dose_Sv = zeros(size(latitudes));
+
+    for k = 1:length(latitudes)
+        % Latitude weighting: more exposure at poles due to trapped particles
+        lat_factor = 1 + 0.5 * sind(latitudes(k))^2;  % varies from 1 to 1.5
+
+        % SAA region boost (as in your previous model)
+        if (latitudes(k) > -50 && latitudes(k) < 0) && (longitudes(k) > -90 && longitudes(k) < -30)
+            saa_boost = 1.5;
+        else
+            saa_boost = 1;
+        end
+
+        % Final dose
+        radiation_dose_Sv(k) = baseline_dose_rate * lat_factor * saa_boost;
+    end
+end
+
+function radiation_dose_Sv = computeRadiationLevelsAE9AP9withSAA(latitudes, longitudes, altitudes)
+    % Improved AE9/AP9-based unshielded model for 550 km polar orbit
+    % Includes stronger and more localized SAA effect
+
+    % Baseline unshielded dose rate (from 20 krad/year AE9/AP9 estimate)
+    baseline_dose_rate = 6.34e-6; % Sv/s
+
+    % Initialize output
+    radiation_dose_Sv = zeros(size(latitudes));
+
+    for k = 1:length(latitudes)
+        % Latitude modulation (simulate higher exposure at poles)
+        lat_factor = 1 + 0.5 * sind(latitudes(k))^2;
+
+        % Default boost factor
+        saa_boost = 1;
+
+        % Stronger, sharper SAA effect
+        if (latitudes(k) > -45 && latitudes(k) < -15) && ...
+           (longitudes(k) > -75 && longitudes(k) < -35)
+            % Centered roughly around (-30°, -55°), like real SAA
+            saa_boost = 4;  % Increase this to see a more visible spike
+        end
+
+        radiation_dose_Sv(k) = baseline_dose_rate * lat_factor * saa_boost;
+    end
 end

@@ -1,11 +1,14 @@
-% Define Keplerian orbital elements to Aurora Mission
+% AuroraCubeSat LOS Analysis
+
+% Define Keplerian orbital elements
 a = 6903e3;        % Semi-major axis in meters
-e = 0.003622;      % Eccentricity (almost circular)
+e = 0.003622;      % Eccentricity
 i = 90;            % Inclination in degrees (polar orbit)
 RAAN = 90;         % Right Ascension of Ascending Node in degrees
 omega = 0;         % Argument of periapsis in degrees
-nu = 0;            % True anomaly at epoch (in degrees)
+nu = 0;            % True anomaly at epoch in degrees
 
+% Earth and orbit constants
 emass = 5.97219e24;           
 G = 6.6743e-11;
 mu = emass * G;  
@@ -17,36 +20,41 @@ ra = (mu/(va)^2)*(1 + e);
 rp = (mu/(vp)^2)*(1 - e);
 
 a = (rp + ra)/2;
-disp(a);
+disp(['Computed semi-major axis: ', num2str(a)]);
 
+% Time configuration
 queryTime = datetime("now", TimeZone="UTC");
 startTime = queryTime;
-stopTime = queryTime + days(7); %hours(24);
+stopTime = queryTime + days(7);
 sampleTime = 10;  % Time step in seconds
 
+% Scenario setup
 scenario = satelliteScenario();
 scenario.StartTime = startTime;
 scenario.StopTime = stopTime;
 scenario.SampleTime = sampleTime;
 
-% Create the satellite and add it to the scenario using Keplerian elements
-satelliteObj = satellite(scenario, a, e, i, RAAN, omega, nu, "OrbitPropagator", "two-body-keplerian", "Name", "AuroraCubeSat");
+% Add satellite to scenario
+satelliteObj = satellite(scenario, a, e, i, RAAN, omega, nu, ...
+    "OrbitPropagator", "two-body-keplerian", ...
+    "Name", "AuroraCubeSat");
 
-latitude = 41.45236;   % Ground station latitude (degrees)
-longitude = -8.29133;  % Ground station longitude (degrees)
-
-% Min Elevation Angle (simulating mountains)
-minElevAngle = 10;  %minElevAngle = 0.0007113;  
-radio_range  = 1700e3; % Theoretical radio link range in meters
+% Ground station info
+latitude = 41.45236;
+longitude = -8.29133;
+minElevAngle = 10;  % Min elevation angle in degrees
+radio_range  = 1700e3; % in meters
 
 % Add ground station
-gs = groundStation(scenario, latitude, longitude, MinElevationAngle=minElevAngle, Name="Ground Station (Azurem)");
+gs = groundStation(scenario, latitude, longitude, ...
+    MinElevationAngle=minElevAngle, ...
+    Name="Ground Station (Azurem)");
 
 % Compute access intervals
 ac = access(satelliteObj, gs);
 acIntervals = accessIntervals(ac);
 
-% Initialize storage for LOS times and distances
+% Initialize storage
 LOS_start_times = [];
 LOS_end_times = [];
 LOS_durations = [];
@@ -59,47 +67,42 @@ if ~isempty(acIntervals)
     % Extract satellite states
     [satStates, ~, timeArray] = states(satelliteObj, "CoordinateFrame", "ecef");
 
-    % Get ground station position in ECEF
+    % Ground station ECEF
     gsECEF = latlon2ecef(latitude, longitude, 0); 
 
-    % Initialize variables to track the start and end of LOS periods
+    % Track LOS periods
     inLOS = false;
-    LOS_start = NaN;
     max_elevation = 0;
 
-    % Iterate through the time array
     for t = 1:length(timeArray)
-        satPos = satStates(1:3, t)';  % Extract satellite position (ECEF)
-        LOS_vector = satPos - gsECEF; % Compute LOS vector
-
-        distance_gs_2_sat = norm(LOS_vector);
+        satPos = satStates(1:3, t)';  
+        LOS_vector = satPos - gsECEF;
+        distance = norm(LOS_vector);
 
         % Compute elevation angle
-        elevation = asind(dot(LOS_vector, gsECEF) / (norm(LOS_vector) * norm(gsECEF)));
+        elevation = asind(dot(LOS_vector, gsECEF) / ...
+            (norm(LOS_vector) * norm(gsECEF)));
 
-        if (elevation > minElevAngle) && (distance_gs_2_sat < radio_range)
+        if (elevation > minElevAngle) && (distance < radio_range)
             if ~inLOS
-                % LOS just started
                 LOS_start = timeArray(t);
                 inLOS = true;
             end
-
             if elevation > max_elevation
                 max_elevation = elevation;
             end
         else
             if inLOS
-                % LOS just ended, record the duration
                 LOS_end = timeArray(t);
                 LOS_duration = minutes(LOS_end - LOS_start);
-                
-                % Store the start time, end time, and duration
+
                 LOS_start_times = [LOS_start_times; LOS_start];
                 LOS_end_times = [LOS_end_times; LOS_end];
                 LOS_durations = [LOS_durations; LOS_duration];
-                LOS_max_elevations = [LOS_max_elevations,max_elevation];
-                max_elevation = 0;
+                LOS_max_elevations = [LOS_max_elevations; max_elevation];
+
                 inLOS = false;
+                max_elevation = 0;
             end
         end
     end
@@ -107,42 +110,40 @@ end
 
 disp("LOS vectors computed successfully.");
 
-% Plot LOS start times vs. duration
-%{
+% === Plotting Section ===
+% Use categorical X-axis from string datetime labels
+xticklabels = string(LOS_start_times);       
+LOS_durations = minutes(LOS_durations);      
+
+% Ensure column vectors
+xticklabels = xticklabels(:);
+LOS_durations = LOS_durations(:);
+LOS_max_elevations = LOS_max_elevations(:);
+
+% Create the bar plot
 figure;
-bar(LOS_start_times, LOS_durations, 'FaceColor', 'b');
-xlabel('Time (UTC)');
+bar(categorical(xticklabels), LOS_durations, 'FaceColor', 'b');
+xlabel('Start Time');
 ylabel('Duration of LOS (minutes)');
-title('Duration of LOS Events with Ground Station');
-title(sprintf('Duration of LOS Events with Ground Station with elevation angle of  %.2f degrees and a radio range of  %.2f km!', round(minElevAngle,2), round(radio_range/1000,2)));  % Concatenated title
-xtickformat('yyyy-MM-dd HH:mm:ss');  % Formatting x-axis to display time
-grid on;
-%}
-figure;
-bar(LOS_start_times, LOS_durations, 'FaceColor', 'b');
-xlabel('Time (UTC)');
-ylabel('Duration of LOS (minutes)');
-title(sprintf('Duration of LOS Events with Ground Station with elevation angle of %.2f degrees and a radio range of %.2f km!', ...
-    round(minElevAngle, 2), round(radio_range / 1000, 2)));  % Concatenated title
-xtickformat('yyyy-MM-dd HH:mm:ss');  % Formatting x-axis to display time
+title(sprintf('LOS Events (Elevation ≥ %.2f° | Range ≤ %.0f km)', ...
+    round(minElevAngle, 2), radio_range / 1000));
 grid on;
 
-% Add text labels inside each bar (vertically aligned)
+% Add max elevation labels inside each bar
 hold on;
 for k = 1:length(LOS_durations)
-    text(LOS_start_times(k), LOS_durations(k) / 2, ...  % Position (X, Y at half height of the bar)
-         sprintf('%.2f°', LOS_max_elevations(k)), ...   % Elevation angle label
+    text(categorical(xticklabels(k)), LOS_durations(k)/2, ...
+         sprintf('%.2f°', LOS_max_elevations(k)), ...
          'HorizontalAlignment', 'center', ...
          'VerticalAlignment', 'middle', ...
-         'Rotation', 90, ...    % Rotates text 90 degrees (vertical)
-         'FontSize', 10, 'FontWeight', 'bold', ...
-         'Color', 'w');  % White text for contrast
+         'Rotation', 90, ...
+         'FontSize', 10, ...
+         'FontWeight', 'bold', ...
+         'Color', 'w');
 end
 hold off;
 
-
-
-% Function to convert Lat/Lon to ECEF coordinates
+% === Lat/Lon to ECEF Conversion Function ===
 function ecef = latlon2ecef(lat, lon, alt)
     R_E = 6371e3; % Earth's radius in meters
     lat = deg2rad(lat);

@@ -1,0 +1,177 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="666pt" height="1288pt" viewBox="0.00 0.00 665.79 1288">
+<g id="graph0" class="graph" transform="translate(4,1284) scale(1)" data-name="SatelliteStateMachine">
+
+<polygon fill="white" stroke="none" points="-4,4 -4,-1284 661.79,-1284 661.79,4 -4,4"/>
+<!-- EndOfLife -->
+<g id="node1" class="node" pointer-events="visible" data-name="EndOfLife">
+
+<ellipse fill="white" stroke="black" cx="191.79" cy="-1222" rx="54" ry="54"/>
+<ellipse fill="none" stroke="black" cx="191.79" cy="-1222" rx="58" ry="58"/>
+<text text-anchor="middle" x="191.79" y="-1225" font-family="Times,serif" font-size="10.00">8 - EndOfLife</text>
+<text text-anchor="middle" x="191.79" y="-1213" font-family="Times,serif" font-size="10.00">Mode</text>
+</g>
+<!-- anchorTopLeft -->
+<!-- EndOfLife&#45;&gt;anchorTopLeft -->
+<!-- Standby -->
+<g id="node2" class="node" pointer-events="visible" data-name="Standby">
+
+<ellipse fill="white" stroke="black" cx="557.79" cy="-1222" rx="54" ry="54"/>
+<text text-anchor="middle" x="557.79" y="-1225" font-family="Times,serif" font-size="10.00">0 - Standby</text>
+<text text-anchor="middle" x="557.79" y="-1213" font-family="Times,serif" font-size="10.00">Mode</text>
+</g>
+<!-- Boot -->
+<g id="node3" class="node" pointer-events="visible" data-name="Boot">
+
+<ellipse fill="white" stroke="black" cx="445.79" cy="-1024" rx="54" ry="54"/>
+<text text-anchor="middle" x="445.79" y="-1027" font-family="Times,serif" font-size="10.00">1 - Boot</text>
+<text text-anchor="middle" x="445.79" y="-1015" font-family="Times,serif" font-size="10.00">Mode</text>
+</g>
+<!-- Standby&#45;&gt;Boot -->
+<g id="edge3" class="edge" data-name="Standby-&gt;Boot">
+
+<path fill="none" stroke="black" d="M531.25,-1174.55C515.27,-1146.58 494.81,-1110.78 477.92,-1081.22"/>
+<polygon fill="black" stroke="black" points="481.09,-1079.72 473.09,-1072.77 475.01,-1083.19 481.09,-1079.72"/>
+</g>
+<!-- anchorTopRight -->
+<!-- Standby&#45;&gt;anchorTopRight -->
+<!-- Control -->
+<g id="node4" class="node" pointer-events="visible" data-name="Control">
+
+<ellipse fill="white" stroke="black" cx="279.79" cy="-830" rx="54" ry="54"/>
+<text text-anchor="middle" x="279.79" y="-833" font-family="Times,serif" font-size="10.00">2 - Control</text>
+<text text-anchor="middle" x="279.79" y="-821" font-family="Times,serif" font-size="10.00">Mode</text>
+</g>
+<!-- Boot&#45;&gt;Control -->
+<g id="edge4" class="edge" data-name="Boot-&gt;Control">
+
+<path fill="none" stroke="black" d="M411,-982.75C385.08,-952.77 349.56,-911.69 322.01,-879.83"/>
+<polygon fill="black" stroke="black" points="325.01,-877.95 315.82,-872.67 319.72,-882.53 325.01,-877.95"/>
+</g>
+<!-- Control&#45;&gt;EndOfLife -->
+<g id="edge8" class="edge" data-name="Control-&gt;EndOfLife">
+
+<path fill="none" stroke="black" d="M268.05,-883.03C252.27,-952.97 224.21,-1077.35 206.88,-1154.15"/>
+<polygon fill="black" stroke="black" points="203.52,-1153.12 204.74,-1163.65 210.35,-1154.66 203.52,-1153.12"/>
+</g>
+<!-- Detumble -->
+<g id="node5" class="node" pointer-events="visible" data-name="Detumble">
+
+<ellipse fill="white" stroke="black" cx="279.79" cy="-636" rx="54" ry="54"/>
+<text text-anchor="middle" x="279.79" y="-639" font-family="Times,serif" font-size="10.00">3 - Detumble</text>
+<text text-anchor="middle" x="279.79" y="-627" font-family="Times,serif" font-size="10.00">Mode</text>
+</g><g id="edge11" class="edge" data-name="Boot-&gt;Emergency" data-comment="Detumble">
+
+<path fill="none" stroke="black" d="M483.7,-985.15C544.67,-920.03 657.79,-779.97 657.79,-637 657.79,-637 657.79,-637 657.79,-441 657.79,-268.04 462.35,-139 361.91,-84.1"/>
+<polygon fill="black" stroke="black" points="363.7,-81.09 353.24,-79.43 360.38,-87.25 363.7,-81.09"/>
+</g>
+<!-- Control&#45;&gt;Detumble -->
+<g id="edge5" class="edge" data-name="Control-&gt;Detumble">
+
+<path fill="none" stroke="black" d="M279.79,-775.52C279.79,-752.53 279.79,-725.46 279.79,-701.38"/>
+<polygon fill="black" stroke="black" points="283.29,-701.71 279.79,-691.71 276.29,-701.71 283.29,-701.71"/>
+</g>
+<!-- Charging -->
+<g id="node6" class="node" pointer-events="visible" data-name="Charging">
+
+<ellipse fill="white" stroke="black" cx="279.79" cy="-442" rx="54" ry="54"/>
+<text text-anchor="middle" x="279.79" y="-445" font-family="Times,serif" font-size="10.00">4 - Charging</text>
+<text text-anchor="middle" x="279.79" y="-433" font-family="Times,serif" font-size="10.00">Mode</text>
+</g>
+<!-- Detumble&#45;&gt;Charging -->
+<g id="edge6" class="edge" data-name="Detumble-&gt;Charging">
+
+<path fill="none" stroke="black" d="M279.79,-581.52C279.79,-558.53 279.79,-531.46 279.79,-507.38"/>
+<polygon fill="black" stroke="black" points="283.29,-507.71 279.79,-497.71 276.29,-507.71 283.29,-507.71"/>
+</g>
+<!-- Payload -->
+<g id="node7" class="node" pointer-events="visible" data-name="Payload">
+
+<ellipse fill="white" stroke="black" cx="161.79" cy="-248" rx="54" ry="54"/>
+<text text-anchor="middle" x="161.79" y="-251" font-family="Times,serif" font-size="10.00">5 - Payload</text>
+<text text-anchor="middle" x="161.79" y="-239" font-family="Times,serif" font-size="10.00">Mode</text>
+</g><g id="edge12" class="edge" data-name="Control-&gt;Emergency" data-comment="Payload">
+
+<path fill="none" stroke="black" d="M231.14,-805.8C195.66,-780.31 152.94,-736.73 129.79,-690 30.7,-489.9 -58.96,-389.02 49.79,-194 88.3,-124.96 176.77,-85.91 239.42,-67.75"/>
+<polygon fill="black" stroke="black" points="240.24,-71.15 248.94,-65.1 238.37,-64.4 240.24,-71.15"/>
+</g>
+<!-- Charging&#45;&gt;Payload -->
+<g id="edge7" class="edge" data-name="Charging-&gt;Payload">
+
+<path fill="none" stroke="black" d="M251.83,-395.5C234.99,-368.1 213.44,-333.03 195.64,-304.07"/>
+<polygon fill="black" stroke="black" points="198.77,-302.48 190.55,-295.8 192.81,-306.15 198.77,-302.48"/>
+</g><g id="edge17" class="edge" data-name="Control-&gt;Software" data-comment="Charging-&gt;Payload">
+
+<path fill="none" stroke="black" d="M302.5,-780.55C326.65,-748.22 363.34,-706.27 394.09,-676.08"/>
+<polygon fill="black" stroke="black" points="396.32,-678.79 401.09,-669.33 391.46,-673.75 396.32,-678.79"/>
+</g>
+<!-- Payload&#45;&gt;Control -->
+<g id="edge9" class="edge" data-name="Payload-&gt;Control">
+
+<path fill="none" stroke="black" d="M158.35,-302.08C154.56,-386.45 153.85,-555.36 196.79,-690 206.64,-720.87 224.45,-752.12 241.05,-777.15"/>
+<polygon fill="black" stroke="black" points="237.98,-778.86 246.49,-785.17 243.77,-774.93 237.98,-778.86"/>
+</g>
+<!-- Software -->
+<!-- Payload&#45;&gt;Emergency -->
+<g id="edge15" class="edge" data-name="Payload-&gt;Emergency">
+
+<path fill="none" stroke="black" d="M193.66,-203.91C214.86,-175.26 242.82,-137.45 265.26,-107.1"/>
+<polygon fill="black" stroke="black" points="268,-109.28 271.13,-99.16 262.37,-105.12 268,-109.28"/>
+</g>
+<!-- Software -->
+<g id="node8" class="node" pointer-events="visible" data-name="Software">
+
+<ellipse fill="white" stroke="black" cx="445.79" cy="-636" rx="54" ry="54"/>
+<text text-anchor="middle" x="445.79" y="-639" font-family="Times,serif" font-size="10.00">6 - Software</text>
+<text text-anchor="middle" x="445.79" y="-627" font-family="Times,serif" font-size="10.00">Update Mode</text>
+</g><g id="edge13" class="edge" data-name="Detumble-&gt;Emergency" data-comment="Software">
+
+<path fill="none" stroke="black" d="M313.05,-593.03C331.66,-566.79 353.04,-531.36 362.79,-496 399.4,-363.31 356.46,-201.68 326.98,-115.68"/>
+<polygon fill="black" stroke="black" points="330.28,-114.54 323.68,-106.25 323.67,-116.84 330.28,-114.54"/>
+</g>
+<!-- Emergency -->
+<!-- Emergency -->
+<g id="node9" class="node" pointer-events="visible" data-name="Emergency">
+
+<ellipse fill="white" stroke="black" cx="303.79" cy="-54" rx="54" ry="54"/>
+<text text-anchor="middle" x="303.79" y="-57" font-family="Times,serif" font-size="10.00">7 - Emergency</text>
+<text text-anchor="middle" x="303.79" y="-45" font-family="Times,serif" font-size="10.00">Mode</text>
+</g>
+<!-- Emergency&#45;&gt;Control -->
+<g id="edge14" class="edge" data-name="Charging-&gt;Emergency" data-comment="Emergency-&gt;Control">
+
+<path fill="none" stroke="black" d="M283.11,-387.73C287.46,-317.7 295.1,-194.77 299.78,-119.53"/>
+<polygon fill="black" stroke="black" points="303.26,-120.05 300.38,-109.85 296.27,-119.61 303.26,-120.05"/>
+</g>
+<!-- Emergency&#45;&gt;Control -->
+
+<!-- Emergency&#45;&gt;Control -->
+<!-- Emergency&#45;&gt;Control -->
+<!-- Z -->
+<g id="edge19" class="edge" data-name="Software-&gt;Control" data-comment="Z">
+
+<path fill="none" stroke="black" d="M423.3,-685.17C399.16,-717.53 362.35,-759.63 331.51,-789.91"/>
+<polygon fill="black" stroke="black" points="329.26,-787.21 324.49,-796.67 334.12,-792.25 329.26,-787.21"/>
+</g>
+<!-- Software&#45;&gt;Z -->
+
+<!-- Emergency&#45;&gt;Control -->
+<g id="edge10" class="edge" data-name="Emergency-&gt;Control">
+
+<path fill="none" stroke="black" d="M255.1,-78.16C207.63,-99.24 140.11,-136.05 107.79,-194 -0.96,-389.02 88.7,-489.9 187.79,-690 202.97,-720.64 226.56,-749.93 246.79,-773.64"/>
+<polygon fill="black" stroke="black" points="243.91,-775.67 253.08,-780.98 249.23,-771.11 243.91,-775.67"/>
+</g>
+
+<g id="edge16" class="edge" data-name="Software-&gt;Emergency" data-comment="Emergency-&gt;Control">
+
+<path fill="none" stroke="black" d="M449.72,-581.73C454.05,-496.75 454.77,-326.57 404.79,-194 392.13,-160.42 369.06,-127.7 348.17,-102.45"/>
+<polygon fill="black" stroke="black" points="350.99,-100.37 341.86,-95 345.65,-104.89 350.99,-100.37"/>
+</g>
+<g id="edge18" class="edge" data-name="Software-&gt;Boot" data-comment="Emergency-&gt;Control">
+
+<path fill="none" stroke="black" d="M445.79,-690.34C445.79,-760.41 445.79,-883.35 445.79,-958.54"/>
+<polygon fill="black" stroke="black" points="442.29,-958.22 445.79,-968.22 449.29,-958.22 442.29,-958.22"/>
+</g>
+
+</g>
+</svg>

@@ -1,0 +1,58 @@
+digraph SatelliteStateMachine {
+    rankdir=TB;                  // Vertical stacking
+    splines=true;                // Smooth arrows
+    concentrate=false;
+    nodesep=0.8;
+    ranksep=1.2;
+
+    node [
+        shape=circle,
+        fixedsize=true,
+        width=1.5,
+        height=1.5,
+        fontsize=10,
+        style=filled,
+        fillcolor=white
+    ];
+
+    // === States ===
+    EndOfLife  [label="8 - EndOfLife\nMode", shape=doublecircle];
+    Standby    [label="0 - Standby\nMode"];
+    Boot       [label="1 - Boot\nMode"];
+    Control    [label="2 - Control\nMode"];
+    Detumble   [label="3 - Detumble\nMode"];
+    Charging   [label="4 - Charging\nMode"];
+    Payload    [label="5 - Payload\nMode"];
+    Software   [label="6 - Software\nUpdate Mode"];
+    Emergency  [label="7 - Emergency\nMode"];
+ 
+
+    { rank=source; EndOfLife }
+    anchorTopLeft [shape=point, style=invis, width=0.01];
+    EndOfLife -> anchorTopLeft [style=invis, weight=100];
+
+    { rank=source; Standby }
+    anchorTopRight [shape=point, style=invis, width=0.01];
+    Standby -> anchorTopRight [style=invis, weight=100];
+
+    // === Transitions ===
+    start       ->      Standby;
+    Standby     ->      Boot;
+    Boot        ->      Control;
+    Control     ->      Detumble    [minlen=1];
+    Detumble    ->      Charging    [minlen=2];
+    Charging    ->      Payload;
+    Control     ->      EndOfLife;
+    Payload     ->      Control;
+    Emergency   ->      Control:l;
+    Boot        ->      Emergency;
+    Control     ->      Emergency;
+    Detumble    ->      Emergency;
+    Charging    ->      Emergency;
+    Payload     ->      Emergency;
+    Software    ->      Emergency;
+    Control     ->      Software;
+    Software    ->      Boot;
+    Software    ->      Control;
+
+}

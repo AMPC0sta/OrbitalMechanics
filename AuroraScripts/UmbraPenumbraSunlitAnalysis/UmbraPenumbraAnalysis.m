@@ -4,8 +4,8 @@
 %semiMajorAxis = 6903e3;      % Semi-major axis (m)
 %eccentricity = 0.003622;     % Eccentricity
 eccentricity = 0;     % Eccentricity
-inclination = 97.6;            % Inclination (deg)
-raan = 0;                   % RAAN (deg)
+inclination = 90;            % Inclination (deg)
+raan = 90;                   % RAAN (deg)
 argPerigee = 0;              % Argument of perigee (deg)
 trueAnomaly = 0;             % True anomaly at epoch (deg)
 semiMajorAxis = 6928.137e3;
@@ -58,6 +58,7 @@ eclipseStatus = zeros(size(positions, 1), 1);
 
 % Calculate the orbital period
 T = 2 * pi * sqrt((semiMajorAxis^3) / mu);  % Orbital period in seconds
+T_minutes = T  / 60;
 
 
 % Loop through all positions to calculate Umbra/Penumbra
