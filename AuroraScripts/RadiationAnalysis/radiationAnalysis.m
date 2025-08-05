@@ -12,7 +12,7 @@ nu = 0;            % True Anomaly (deg)
 
 queryTime = datetime(2024, 2, 1, 12, 0, 0, 'TimeZone', 'UTC');  
 startTime = queryTime;
-stopTime = queryTime + minutes(100); % 24-hour simulation
+stopTime = queryTime + minutes(1440); % 24-hour simulation
 sampleTime = 30;  % 30-second time step
 
 % Create Satellite Scenario and Propagate Orbit
